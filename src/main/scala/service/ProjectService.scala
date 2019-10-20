@@ -5,8 +5,8 @@ import slick.jdbc.SQLiteProfile.api._
 
 object ProjectService
 {
-    def getProjects(db: Database) =
-    {
-        db.run(Project.result)
-    }
+    var db:Database=_
+
+    def getProjects = db.run(Project.result)
+
 }

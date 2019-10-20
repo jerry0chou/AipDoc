@@ -1,4 +1,4 @@
-import controller.{ModuleServlet, ProjectServlet}
+import controller.{IndexServlet, ModuleServlet, ProjectServlet}
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.scalatra._
 import javax.servlet.ServletContext
@@ -16,6 +16,7 @@ class ScalatraBootstrap extends LifeCycle
         val db = Database.forDataSource(cpds, None) // create the Database object
 
         // 路由注册
+        context.mount(new IndexServlet, "/")
         context.mount(new ProjectServlet(db), "/project")
         context.mount(new ModuleServlet(db), "/module")
     }

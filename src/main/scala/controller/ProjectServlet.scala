@@ -9,9 +9,11 @@ class ProjectServlet(val db: Database) extends ScalatraServlet with FutureSuppor
 {
     protected implicit def executor = scala.concurrent.ExecutionContext.Implicits.global
 
+    ProjectService.db=db
+
     get("/getProjects")
     {
-         ProjectService.getProjects(db)
+         ProjectService.getProjects
     }
 }
 

@@ -5,8 +5,8 @@ import slick.jdbc.SQLiteProfile.api._
 
 object ModuleService
 {
-    def getModules(db: Database) =
-    {
-        db.run(Module.result)
-    }
+    var db:Database=_
+
+    def getModules =db.run(Module.result)
+
 }

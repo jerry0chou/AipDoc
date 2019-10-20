@@ -1,17 +1,15 @@
 package controller
 
 import org.scalatra.{FutureSupport, ScalatraServlet}
-import service.ModuleService
 import slick.jdbc.SQLiteProfile.api._
+import org.scalatra._
 
-class ModuleServlet(val db: Database) extends ScalatraServlet with FutureSupport
+class IndexServlet extends ScalatraServlet with FutureSupport
 {
     protected implicit def executor = scala.concurrent.ExecutionContext.Implicits.global
 
-    ModuleService.db=db
-
-    get("/getModules")
+    get("/")
     {
-        ModuleService.getModules
+        views.html.index()
     }
 }
