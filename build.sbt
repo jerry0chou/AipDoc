@@ -1,4 +1,4 @@
-val ScalatraVersion = "2.6.3"
+val ScalatraVersion = "2.6.5"
 
 name := "ApiDoc"
 
@@ -21,7 +21,10 @@ libraryDependencies ++= Seq(
     "org.eclipse.jetty" % "jetty-webapp" % "9.4.19.v20190610" % "container;compile",
     "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided",
 
-    "com.mchange" % "c3p0" % "0.9.5.2"
+    "com.mchange" % "c3p0" % "0.9.5.2",
+
+    "org.scalatra" %% "scalatra-json" % ScalatraVersion,
+    "org.json4s"   %% "json4s-jackson" % "3.5.2",
 )
 
 enablePlugins(SbtTwirl)
