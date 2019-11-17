@@ -24,7 +24,7 @@ libraryDependencies ++= Seq(
     "com.mchange" % "c3p0" % "0.9.5.2",
 
     "org.scalatra" %% "scalatra-json" % ScalatraVersion,
-    "org.json4s"   %% "json4s-jackson" % "3.5.2",
+    "org.json4s"   %% "json4s-jackson" % "3.5.3",
 )
 
 enablePlugins(SbtTwirl)
