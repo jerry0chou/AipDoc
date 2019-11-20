@@ -18,9 +18,9 @@ object ProjectService
         // add
         if (pro.projId == -1) {
             val addProject = Project += ProjectRow(-1, pro.projName, Some(pro.projDesc))
-            val maxID=Project.map(_.projId).max
-            val project=Project.filter(e=>e.projId == maxID).result
-            db.run(addProject andThen(project)).map { res => success(res, "添加成功") }
+//            val maxID=Project.map(_.projId).max
+//            val project=Project.filter(e=>e.projId == maxID).result
+            db.run(addProject ).map { res => success(res, "添加成功") }
         }
         // update
         else {

@@ -7,6 +7,10 @@
     </encoder>
 </appender>
 
+    <logger name="slick" level="INFO" />
+    <logger name="slick.jdbc" level="DEBUG" />
+
+
 <root level="info">
     <appender-ref ref="STDOUT" />
 </root>
