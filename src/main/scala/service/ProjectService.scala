@@ -17,15 +17,16 @@ object ProjectService
     {
         // add
         if (pro.projId == -1) {
-            val addProject = Project += ProjectRow(-1, pro.projName, Some(pro.projDesc))
-//            val maxID=Project.map(_.projId).max
-//            val project=Project.filter(e=>e.projId == maxID).result
-            db.run(addProject ).map { res => success(res, "添加成功") }
+            val insert = Project += ProjectRow(-1, pro.projName, Some(pro.projDesc))
+            val maxID = Project.map(_.projId).max
+            val getProject = Project.filter(_.projId === maxID).result
+            db.run((insert >> getProject).transactionally).map { res => success(res.headOption, "add successfully") }
         }
         // update
         else {
             val updateProject = Project.filter(_.projId === pro.projId).map(p => (p.projName, p.projDesc)).update((pro.projName, Some(pro.projDesc)))
-            db.run(updateProject).map(_ => success("OK", "更新成功"))
+            val getProject = Project.filter(_.projId === pro.projId).result
+            db.run((updateProject >> getProject).transactionally).map(res => success(res.headOption, "update successfully"))
         }
     }
 

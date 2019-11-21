@@ -54,7 +54,7 @@ trait Tables {
     val apiFailure: Rep[String] = column[String]("api_failure")
 
     /** Foreign key referencing Module (database name module_FK_1) */
-    lazy val moduleFk = foreignKey("module_FK_1", modId, Module)(r => r.modId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+    lazy val moduleFk = foreignKey("module_FK_1", modId, Module)(r => r.modId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
   }
   /** Collection-like TableQuery object for table Api */
   lazy val Api = new TableQuery(tag => new Api(tag))
@@ -86,7 +86,7 @@ trait Tables {
     val modDesc: Rep[Option[String]] = column[Option[String]]("mod_desc")
 
     /** Foreign key referencing Project (database name project_FK_1) */
-    lazy val projectFk = foreignKey("project_FK_1", projId, Project)(r => r.projId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+    lazy val projectFk = foreignKey("project_FK_1", projId, Project)(r => r.projId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
   }
   /** Collection-like TableQuery object for table Module */
   lazy val Module = new TableQuery(tag => new Module(tag))
@@ -121,7 +121,7 @@ trait Tables {
     val paramDesc: Rep[String] = column[String]("param_desc")
 
     /** Foreign key referencing Api (database name api_FK_1) */
-    lazy val apiFk = foreignKey("api_FK_1", apiId, Api)(r => r.apiId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+    lazy val apiFk = foreignKey("api_FK_1", apiId, Api)(r => r.apiId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
   }
   /** Collection-like TableQuery object for table Param */
   lazy val Param = new TableQuery(tag => new Param(tag))
