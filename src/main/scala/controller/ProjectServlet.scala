@@ -18,14 +18,10 @@ class ProjectServlet(val db: Database) extends ScalatraServlet with FutureSuppor
         contentType = formats("json")
     }
     get("/getProjectList") {
-        println("/getProjectList")
         ProjectService.getProjectList
     }
-    //add
     post("/addOrEditProject") {
-        println("POST /projets")
         val pro = parsedBody.extract[ProjectVar]
-        println(pro)
         ProjectService.addOrEditProject(pro)
     }
 
@@ -33,7 +29,6 @@ class ProjectServlet(val db: Database) extends ScalatraServlet with FutureSuppor
     post("/deleteProject")
     {
         val id=parsedBody.extract[ID]
-        println(id)
         ProjectService.deleteProject(id)
     }
 }
