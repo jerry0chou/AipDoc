@@ -23,20 +23,19 @@ trait Tables {
    *  @param modId Database column mod_id SqlType(INTEGER)
    *  @param apiName Database column api_name SqlType(TEXT)
    *  @param apiType Database column api_type SqlType(TEXT)
-   *  @param apiParams Database column api_params SqlType(TEXT)
-   *  @param apiSuccess Database column api_success SqlType(TEXT)
-   *  @param apiFailure Database column api_failure SqlType(TEXT) */
-  case class ApiRow(apiId: Int, modId: Int, apiName: String, apiType: String, apiParams: String, apiSuccess: String, apiFailure: String)
+   *  @param success Database column success SqlType(TEXT)
+   *  @param failure Database column failure SqlType(TEXT) */
+  case class ApiRow(apiId: Int, modId: Int, apiName: String, apiType: String, success: Option[String], failure: Option[String])
   /** GetResult implicit for fetching ApiRow objects using plain SQL queries */
-  implicit def GetResultApiRow(implicit e0: GR[Int], e1: GR[String]): GR[ApiRow] = GR{
+  implicit def GetResultApiRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[String]]): GR[ApiRow] = GR{
     prs => import prs._
-    ApiRow.tupled((<<[Int], <<[Int], <<[String], <<[String], <<[String], <<[String], <<[String]))
+    ApiRow.tupled((<<[Int], <<[Int], <<[String], <<[String], <<?[String], <<?[String]))
   }
   /** Table description of table api. Objects of this class serve as prototypes for rows in queries. */
   class Api(_tableTag: Tag) extends profile.api.Table[ApiRow](_tableTag, "api") {
-    def * = (apiId, modId, apiName, apiType, apiParams, apiSuccess, apiFailure) <> (ApiRow.tupled, ApiRow.unapply)
+    def * = (apiId, modId, apiName, apiType, success, failure) <> (ApiRow.tupled, ApiRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(apiId), Rep.Some(modId), Rep.Some(apiName), Rep.Some(apiType), Rep.Some(apiParams), Rep.Some(apiSuccess), Rep.Some(apiFailure)).shaped.<>({r=>import r._; _1.map(_=> ApiRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(apiId), Rep.Some(modId), Rep.Some(apiName), Rep.Some(apiType), success, failure).shaped.<>({r=>import r._; _1.map(_=> ApiRow.tupled((_1.get, _2.get, _3.get, _4.get, _5, _6)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column api_id SqlType(INTEGER), AutoInc, PrimaryKey */
     val apiId: Rep[Int] = column[Int]("api_id", O.AutoInc, O.PrimaryKey)
@@ -46,15 +45,13 @@ trait Tables {
     val apiName: Rep[String] = column[String]("api_name")
     /** Database column api_type SqlType(TEXT) */
     val apiType: Rep[String] = column[String]("api_type")
-    /** Database column api_params SqlType(TEXT) */
-    val apiParams: Rep[String] = column[String]("api_params")
-    /** Database column api_success SqlType(TEXT) */
-    val apiSuccess: Rep[String] = column[String]("api_success")
-    /** Database column api_failure SqlType(TEXT) */
-    val apiFailure: Rep[String] = column[String]("api_failure")
+    /** Database column success SqlType(TEXT) */
+    val success: Rep[Option[String]] = column[Option[String]]("success")
+    /** Database column failure SqlType(TEXT) */
+    val failure: Rep[Option[String]] = column[Option[String]]("failure")
 
     /** Foreign key referencing Module (database name module_FK_1) */
-    lazy val moduleFk = foreignKey("module_FK_1", modId, Module)(r => r.modId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
+    lazy val moduleFk = foreignKey("module_FK_1", modId, Module)(r => r.modId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
   }
   /** Collection-like TableQuery object for table Api */
   lazy val Api = new TableQuery(tag => new Api(tag))
@@ -86,7 +83,7 @@ trait Tables {
     val modDesc: Rep[Option[String]] = column[Option[String]]("mod_desc")
 
     /** Foreign key referencing Project (database name project_FK_1) */
-    lazy val projectFk = foreignKey("project_FK_1", projId, Project)(r => r.projId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
+    lazy val projectFk = foreignKey("project_FK_1", projId, Project)(r => r.projId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
   }
   /** Collection-like TableQuery object for table Module */
   lazy val Module = new TableQuery(tag => new Module(tag))
@@ -121,7 +118,7 @@ trait Tables {
     val paramDesc: Rep[String] = column[String]("param_desc")
 
     /** Foreign key referencing Api (database name api_FK_1) */
-    lazy val apiFk = foreignKey("api_FK_1", apiId, Api)(r => r.apiId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.Cascade)
+    lazy val apiFk = foreignKey("api_FK_1", apiId, Api)(r => r.apiId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
   }
   /** Collection-like TableQuery object for table Param */
   lazy val Param = new TableQuery(tag => new Param(tag))

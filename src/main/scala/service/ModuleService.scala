@@ -2,7 +2,7 @@ package service
 
 import model.Tables._
 import slick.jdbc.SQLiteProfile.api._
-import utils.Store.{ModApiList, ModuleVar, SimpleApi}
+import utils.Store.{ID, ModApiList, ModuleVar, SimpleApi}
 import utils.result._
 import scala.collection.mutable.ArrayBuffer
 
@@ -24,7 +24,7 @@ object ModuleService
             val res = ArrayBuffer[ModApiList]()
             for ((k, v) <- map) {
                 val ab = ArrayBuffer[SimpleApi]()
-                v.filterNot(_._2==null).map { e =>
+                v.filterNot(_._2 == null).map { e =>
                     ab += SimpleApi(e._1, e._2)
                 }
                 res += ModApiList(k._1, k._2, ab)
@@ -43,5 +43,22 @@ object ModuleService
             val getModule = Module.filter(_.modId === maxID).result
             db.run((insert >> getModule).transactionally).map { res => success(res.headOption, "add successfully") }
         }
+        else {
+            val updatModule = Module.filter(_.modId === mod.modId).map(m => (m.modName, m.modDesc)).update((mod.modName, Some(mod.modDesc)))
+            val getModule = Module.filter(_.modId === mod.modId).result
+            db.run(updatModule >> getModule).map(res => success(res.headOption, "update successfully"))
+        }
+    }
+
+    def getModule(modId: Int) =
+    {
+        val mod = Module.filter(_.modId === modId).result
+        db.run(mod).map(res => success(res.headOption, "get Module successfully"))
+    }
+
+    def deleteModule(modId: Int) =
+    {
+        val deleteModule = Module.filter(_.modId === modId).delete
+        db.run(deleteModule).map(res => success(res, "delete successfully"))
     }
 }

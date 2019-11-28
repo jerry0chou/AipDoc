@@ -3,9 +3,9 @@ package utils
 object result
 {
 
-    case class ResultSet[T](code: Int, data: T, Msg: String)
+    case class ResultSet[T](code: Int, data: T, msg: String)
 
-    def success[T](data: T, Msg: String) = ResultSet[T](200, data, Msg)
+    def success[T](data: T, msg: String) = ResultSet[T](200, data, msg)
 
-    def failure[T](data: T, Msg: String) = ResultSet[T](500, data, Msg)
+    def failure[T](data: T, msg: String) = ResultSet[T](500, data, msg)
 }

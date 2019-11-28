@@ -31,5 +31,16 @@ class ModuleServlet(val db: Database) extends ScalatraServlet with FutureSupport
         ModuleService.addOrEditModule(mod)
     }
 
+    post("/getModule")
+    {
+        val id=parsedBody.extract[ID]
+        println(id)
+        ModuleService.getModule(id.id)
+    }
 
+    post("/deleteModule")
+    {
+        val id=parsedBody.extract[ID]
+        ModuleService.deleteModule(id.id)
+    }
 }
