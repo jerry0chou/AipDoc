@@ -25,4 +25,14 @@ object ApiService
             db.run(updatApi >> getApi).map(res => success(res.headOption, "update successfully"))
         }
     }
+
+    def getModApiNums(id: Int) =
+    {
+        val query =
+            sql"""
+                SELECT count(mod_id) as nums from module where proj_id=12 UNION
+                SELECT count(api_id) from api where mod_id in (SELECT mod_id from module where proj_id=12)
+            """.as[Int]
+        db.run(query).map(res => success(res, "query succesfully"))
+    }
 }
