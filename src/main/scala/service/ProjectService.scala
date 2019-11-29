@@ -11,7 +11,7 @@ object ProjectService
 
     protected implicit def executor = scala.concurrent.ExecutionContext.Implicits.global
 
-    def getProjectList = db.run(Project.result).map { res => success(res, "查询项目成功") }
+    def getProjectList = db.run(Project.result).map { res => success(res, "query successfully") }
 
     def addOrEditProject(pro: ProjectVar) =
     {
@@ -33,6 +33,6 @@ object ProjectService
     def deleteProject(i: ID) =
     {
         val deleteProject = Project.filter(_.projId === i.id).delete
-        db.run(deleteProject).map(_ => success("OK", "删除成功"))
+        db.run(deleteProject).map(_ => success("OK", "delete Successfully"))
     }
 }

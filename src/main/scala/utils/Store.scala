@@ -11,10 +11,12 @@ object Store
 
     case class ModuleVar(modId: Int, projId: Int, modName: String, modDesc: String)
 
-    case class SimpleApi(apiId: Int, apiName: String)
+    case class SimpleApi(apiId: Int, apiName: String,apiType:String)
 
     case class ModApiList(modId: Int, modName: String, apiList: ArrayBuffer[SimpleApi])
 
     case class ID(id: Int)
+
+    case class ApiVar(apiId: Int, modId: Int, apiName: String, apiType: String, success: String, failure: String)
 
 }

@@ -11,36 +11,26 @@ import utils.Store.{ID, ModuleVar}
 class ModuleServlet(val db: Database) extends ScalatraServlet with FutureSupport with JacksonJsonSupport
 {
     protected implicit def executor = scala.concurrent.ExecutionContext.Implicits.global
+
     protected implicit lazy val jsonFormats: Formats = DefaultFormats
-
-    ModuleService.db=db
-
+    ModuleService.db = db
     before() {
         contentType = formats("json")
     }
-
-    post("/getModApi")
-    {
-        val id=parsedBody.extract[ID]
+    post("/getModApi") {
+        val id = parsedBody.extract[ID]
         ModuleService.getModApi(id.id)
     }
-
-    post("/addOrEditModule")
-    {
-        val mod=parsedBody.extract[ModuleVar]
+    post("/addOrEditModule") {
+        val mod = parsedBody.extract[ModuleVar]
         ModuleService.addOrEditModule(mod)
     }
-
-    post("/getModule")
-    {
-        val id=parsedBody.extract[ID]
-        println(id)
+    post("/getModule") {
+        val id = parsedBody.extract[ID]
         ModuleService.getModule(id.id)
     }
-
-    post("/deleteModule")
-    {
-        val id=parsedBody.extract[ID]
+    post("/deleteModule") {
+        val id = parsedBody.extract[ID]
         ModuleService.deleteModule(id.id)
     }
 }
