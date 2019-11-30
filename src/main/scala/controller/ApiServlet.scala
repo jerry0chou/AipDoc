@@ -5,7 +5,7 @@ import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.{FutureSupport, ScalatraServlet}
 import service.ApiService
 import slick.jdbc.SQLiteProfile.api._
-import utils.Store.{ApiVar, ID}
+import utils.Store.{ApiVar, ID, JsonString}
 
 class ApiServlet(val db: Database) extends ScalatraServlet with FutureSupport with JacksonJsonSupport
 {
@@ -16,12 +16,20 @@ class ApiServlet(val db: Database) extends ScalatraServlet with FutureSupport wi
     before() {
         contentType = formats("json")
     }
-    post("/addOrEditApi") {
+    post("/addApi") {
         val api = parsedBody.extract[ApiVar]
-        ApiService.addOrEditApi(api)
+        ApiService.addApi(api)
     }
     post("/getModApiNums") {
         val id = parsedBody.extract[ID]
         ApiService.getModApiNums(id.id)
+    }
+    post("/updateParams") {
+        val json = parsedBody.extract[JsonString]
+        ApiService.updateParams(json.apiId, json.params)
+    }
+    post("/getApiInfo") {
+        val id = parsedBody.extract[ID]
+        ApiService.getApiInfo(id.id)
     }
 }

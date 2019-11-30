@@ -14,7 +14,7 @@ trait Tables {
   import slick.jdbc.{GetResult => GR}
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = Api.schema ++ Module.schema ++ Param.schema ++ Project.schema
+  lazy val schema: profile.SchemaDescription = Api.schema ++ Module.schema ++ Project.schema
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -23,19 +23,20 @@ trait Tables {
    *  @param modId Database column mod_id SqlType(INTEGER)
    *  @param apiName Database column api_name SqlType(TEXT)
    *  @param apiType Database column api_type SqlType(TEXT)
+   *  @param params Database column params SqlType(TEXT)
    *  @param success Database column success SqlType(TEXT)
    *  @param failure Database column failure SqlType(TEXT) */
-  case class ApiRow(apiId: Int, modId: Int, apiName: String, apiType: String, success: Option[String], failure: Option[String])
+  case class ApiRow(apiId: Int, modId: Int, apiName: String, apiType: String, params: Option[String], success: Option[String], failure: Option[String])
   /** GetResult implicit for fetching ApiRow objects using plain SQL queries */
   implicit def GetResultApiRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[String]]): GR[ApiRow] = GR{
     prs => import prs._
-    ApiRow.tupled((<<[Int], <<[Int], <<[String], <<[String], <<?[String], <<?[String]))
+    ApiRow.tupled((<<[Int], <<[Int], <<[String], <<[String], <<?[String], <<?[String], <<?[String]))
   }
   /** Table description of table api. Objects of this class serve as prototypes for rows in queries. */
   class Api(_tableTag: Tag) extends profile.api.Table[ApiRow](_tableTag, "api") {
-    def * = (apiId, modId, apiName, apiType, success, failure) <> (ApiRow.tupled, ApiRow.unapply)
+    def * = (apiId, modId, apiName, apiType, params, success, failure) <> (ApiRow.tupled, ApiRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(apiId), Rep.Some(modId), Rep.Some(apiName), Rep.Some(apiType), success, failure).shaped.<>({r=>import r._; _1.map(_=> ApiRow.tupled((_1.get, _2.get, _3.get, _4.get, _5, _6)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(apiId), Rep.Some(modId), Rep.Some(apiName), Rep.Some(apiType), params, success, failure).shaped.<>({r=>import r._; _1.map(_=> ApiRow.tupled((_1.get, _2.get, _3.get, _4.get, _5, _6, _7)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column api_id SqlType(INTEGER), AutoInc, PrimaryKey */
     val apiId: Rep[Int] = column[Int]("api_id", O.AutoInc, O.PrimaryKey)
@@ -45,6 +46,8 @@ trait Tables {
     val apiName: Rep[String] = column[String]("api_name")
     /** Database column api_type SqlType(TEXT) */
     val apiType: Rep[String] = column[String]("api_type")
+    /** Database column params SqlType(TEXT) */
+    val params: Rep[Option[String]] = column[Option[String]]("params")
     /** Database column success SqlType(TEXT) */
     val success: Rep[Option[String]] = column[Option[String]]("success")
     /** Database column failure SqlType(TEXT) */
@@ -87,41 +90,6 @@ trait Tables {
   }
   /** Collection-like TableQuery object for table Module */
   lazy val Module = new TableQuery(tag => new Module(tag))
-
-  /** Entity class storing rows of table Param
-   *  @param paramId Database column param_id SqlType(INTEGER), AutoInc, PrimaryKey
-   *  @param apiId Database column api_id SqlType(INTEGER)
-   *  @param paramName Database column param_name SqlType(TEXT)
-   *  @param paramType Database column param_type SqlType(TEXT)
-   *  @param paramDesc Database column param_desc SqlType(TEXT) */
-  case class ParamRow(paramId: Int, apiId: Int, paramName: String, paramType: String, paramDesc: String)
-  /** GetResult implicit for fetching ParamRow objects using plain SQL queries */
-  implicit def GetResultParamRow(implicit e0: GR[Int], e1: GR[String]): GR[ParamRow] = GR{
-    prs => import prs._
-    ParamRow.tupled((<<[Int], <<[Int], <<[String], <<[String], <<[String]))
-  }
-  /** Table description of table param. Objects of this class serve as prototypes for rows in queries. */
-  class Param(_tableTag: Tag) extends profile.api.Table[ParamRow](_tableTag, "param") {
-    def * = (paramId, apiId, paramName, paramType, paramDesc) <> (ParamRow.tupled, ParamRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(paramId), Rep.Some(apiId), Rep.Some(paramName), Rep.Some(paramType), Rep.Some(paramDesc)).shaped.<>({r=>import r._; _1.map(_=> ParamRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column param_id SqlType(INTEGER), AutoInc, PrimaryKey */
-    val paramId: Rep[Int] = column[Int]("param_id", O.AutoInc, O.PrimaryKey)
-    /** Database column api_id SqlType(INTEGER) */
-    val apiId: Rep[Int] = column[Int]("api_id")
-    /** Database column param_name SqlType(TEXT) */
-    val paramName: Rep[String] = column[String]("param_name")
-    /** Database column param_type SqlType(TEXT) */
-    val paramType: Rep[String] = column[String]("param_type")
-    /** Database column param_desc SqlType(TEXT) */
-    val paramDesc: Rep[String] = column[String]("param_desc")
-
-    /** Foreign key referencing Api (database name api_FK_1) */
-    lazy val apiFk = foreignKey("api_FK_1", apiId, Api)(r => r.apiId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-  }
-  /** Collection-like TableQuery object for table Param */
-  lazy val Param = new TableQuery(tag => new Param(tag))
 
   /** Entity class storing rows of table Project
    *  @param projId Database column proj_id SqlType(INTEGER), AutoInc, PrimaryKey

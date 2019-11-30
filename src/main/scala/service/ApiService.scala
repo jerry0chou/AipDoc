@@ -1,8 +1,9 @@
 package service
 
 import slick.jdbc.SQLiteProfile.api._
-import utils.Store.ApiVar
+import utils.Store.{ApiInfo, ApiVar}
 import model.Tables._
+import slick.jdbc.GetResult
 import utils.result._
 
 object ApiService
@@ -11,28 +12,40 @@ object ApiService
 
     protected implicit def executor = scala.concurrent.ExecutionContext.Implicits.global
 
-    def addOrEditApi(api: ApiVar) =
+    def addApi(api: ApiVar) =
     {
         if (api.apiId == -1) {
-            val insertApi = Api += ApiRow(-1, api.modId, api.apiName, api.apiType, Some(api.success), Some(api.failure))
+            val insertApi = Api += ApiRow(-1, api.modId, api.apiName, api.apiType, None, None, None)
             val maxID = Api.map(_.apiId).max
             val getApi = Api.filter(_.apiId === maxID).result
             db.run((insertApi >> getApi).transactionally).map(res => success(res.headOption, "add successfully"))
         }
-        else {
-            val updatApi = Api.filter(_.apiId === api.apiId).map(a => (a.apiName, a.apiType, a.success, a.failure)).update((api.apiName, api.apiType, Some(api.success), Some(api.failure)))
-            val getApi = Api.filter(_.apiId === api.apiId).result
-            db.run(updatApi >> getApi).map(res => success(res.headOption, "update successfully"))
-        }
     }
 
-    def getModApiNums(id: Int) =
+    def getModApiNums(projId: Int) =
     {
         val query =
             sql"""
-                SELECT count(mod_id) as nums from module where proj_id=12 UNION
-                SELECT count(api_id) from api where mod_id in (SELECT mod_id from module where proj_id=12)
+                SELECT count(mod_id) as nums from module where proj_id=${projId} UNION
+                SELECT count(api_id) from api where mod_id in (SELECT mod_id from module where proj_id=${projId})
             """.as[Int]
         db.run(query).map(res => success(res, "query succesfully"))
+    }
+
+    def updateParams(apiId: Int, params: String) =
+    {
+        val update = Api.filter(_.apiId === apiId).map(_.params).update(Some(params))
+        db.run(update).map(res => success(res, "update succesfully"))
+    }
+
+    def getApiInfo(apiId: Int) =
+    {
+        implicit val getApiInfoResult = GetResult(r => ApiInfo(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<))
+        val query =
+            sql"""
+                SELECT module.mod_name, api.api_name,api.api_type,api.params,api.success,api.failure
+                from module,api where api.mod_id = module.mod_id and api.api_id =${apiId}
+               """.as[ApiInfo]
+        db.run(query).map(res => success(res.headOption, "query successfully"))
     }
 }
