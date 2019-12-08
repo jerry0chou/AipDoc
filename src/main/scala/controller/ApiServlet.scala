@@ -24,12 +24,20 @@ class ApiServlet(val db: Database) extends ScalatraServlet with FutureSupport wi
         val id = parsedBody.extract[ID]
         ApiService.getModApiNums(id.id)
     }
-    post("/updateParams") {
+    post("/saveColumn") {
         val json = parsedBody.extract[JsonString]
-        ApiService.updateParams(json.apiId, json.params)
+        ApiService.saveColumn(json)
     }
     post("/getApiInfo") {
         val id = parsedBody.extract[ID]
         ApiService.getApiInfo(id.id)
+    }
+    post("/deleteApi") {
+        val id = parsedBody.extract[ID]
+        ApiService.deleteApi(id.id)
+    }
+    post("/genPythonCode") {
+       val id=parsedBody.extract[ID]
+        ApiService.genPythonCode(id.id)
     }
 }

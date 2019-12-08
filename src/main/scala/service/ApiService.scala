@@ -1,10 +1,11 @@
 package service
 
 import slick.jdbc.SQLiteProfile.api._
-import utils.Store.{ApiInfo, ApiVar}
+import utils.Store.{ApiInfo, ApiVar, JsonString}
 import model.Tables._
 import slick.jdbc.GetResult
 import utils.result._
+import utils.handle._
 
 object ApiService
 {
@@ -15,7 +16,7 @@ object ApiService
     def addApi(api: ApiVar) =
     {
         if (api.apiId == -1) {
-            val insertApi = Api += ApiRow(-1, api.modId, api.apiName, api.apiType, None, None, None)
+            val insertApi = Api += ApiRow(-1, api.modId, api.apiName, api.apiType, None, None, None, nowToString, nowToString)
             val maxID = Api.map(_.apiId).max
             val getApi = Api.filter(_.apiId === maxID).result
             db.run((insertApi >> getApi).transactionally).map(res => success(res.headOption, "add successfully"))
@@ -26,15 +27,22 @@ object ApiService
     {
         val query =
             sql"""
-                SELECT count(mod_id) as nums from module where proj_id=${projId} UNION
+                SELECT count(mod_id) as nums from module where proj_id=${projId} UNION All
                 SELECT count(api_id) from api where mod_id in (SELECT mod_id from module where proj_id=${projId})
             """.as[Int]
         db.run(query).map(res => success(res, "query succesfully"))
     }
 
-    def updateParams(apiId: Int, params: String) =
+    def saveColumn(json: JsonString) =
     {
-        val update = Api.filter(_.apiId === apiId).map(_.params).update(Some(params))
+        val update = Api.filter(_.apiId === json.apiId).map(e => {
+            if (json.typename == "params")
+                e.params
+            else if (json.typename == "success")
+                e.success
+            else
+                e.failure
+        }).update(Some(json.content))
         db.run(update).map(res => success(res, "update succesfully"))
     }
 
@@ -47,5 +55,43 @@ object ApiService
                 from module,api where api.mod_id = module.mod_id and api.api_id =${apiId}
                """.as[ApiInfo]
         db.run(query).map(res => success(res.headOption, "query successfully"))
+    }
+
+    def deleteApi(apiId: Int) =
+    {
+        val delete = Api.filter(_.apiId === apiId).delete
+        db.run(delete).map(res => success(res, "delete successfully"))
+    }
+
+    def genPythonCode(apiId: Int) =
+    {
+        def build(apiName: String, apiType: String, success: Option[String]) =
+        {
+            val pattern = """\w+""".r
+            val funcName = pattern.findAllIn(apiName).mkString("_")
+            val code =
+                s"""
+                   |from flask import Flask, request, jsonify
+                   |app = Flask(__name__)
+                   |
+                   |@app.route('${apiName}', methods=['${apiType}'])
+                   |def ${funcName}():
+                   |    print(request.json)
+                   |    result=${success.getOrElse("")}
+                   |    return jsonify(result)
+                   |
+                   |if __name__ == '__main__':
+                   |    app.run(debug=True)
+                   |
+                   |""".stripMargin
+            code
+        }
+
+        val query = Api.filter(_.apiId === apiId).result
+        db.run(query).map(res => {
+            val ele = res.head
+            val str = build(ele.apiName, ele.apiType, ele.success)
+            success(str, "already generate python code")
+        })
     }
 }

@@ -19,7 +19,7 @@ object Store
 
     case class ApiVar(apiId: Int, modId: Int, apiName: String, apiType: String, success: String, failure: String)
 
-    case class JsonString(apiId: Int, params: String)
+    case class  JsonString(apiId: Int, typename: String, content: String)
 
     case class ApiInfo(modName: String, apiName: String, apiType: String, params: String, success: String, failure: String)
 
