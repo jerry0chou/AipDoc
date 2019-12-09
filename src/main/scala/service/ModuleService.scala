@@ -38,10 +38,22 @@ object ModuleService
     {
         // add
         if (mod.modId == -1) {
-            val insert = Module += ModuleRow(-1, mod.projId, mod.modName, Some(mod.modDesc), nowToString, nowToString)
-            val maxID = Module.map(_.modId).max
-            val getModule = Module.filter(_.modId === maxID).result
-            db.run((insert >> getModule).transactionally).map { res => success(res.headOption, "add successfully") }
+            var sign = "success"
+            val insert = Module.filter(m => m.projId === mod.projId && m.modName === mod.modName).exists.result.flatMap(exists => {
+                if (!exists)
+                    Module += ModuleRow(-1, mod.projId, mod.modName, Some(mod.modDesc), nowToString, nowToString)
+                else {
+                    sign = "failure"
+                    DBIO.successful(None)
+                }
+            }).transactionally
+            exec(insert, db)
+            if (sign == "failure")
+                failure("", "module name already exists")
+            else {
+                val getModule = Module.filter(_.modId === Module.map(_.modId).max).result
+                db.run(getModule).map { res => success(res.headOption, "add successfully") }
+            }
         }
         else {
             val updatModule = Module.filter(_.modId === mod.modId).map(m => (m.modName, m.modDesc, m.editedTime)).update((mod.modName, Some(mod.modDesc), nowToString))
@@ -58,7 +70,12 @@ object ModuleService
 
     def deleteModule(modId: Int) =
     {
+        val deleteApi =
+            sqlu"""
+                delete FROM api where api.mod_id in
+                (SELECT mod_id from module where module.mod_id =${modId})
+                """
         val deleteModule = Module.filter(_.modId === modId).delete
-        db.run(deleteModule).map(res => success(res, "delete successfully"))
+        db.run((deleteApi >> deleteModule).transactionally).map(res => success(res, "delete successfully"))
     }
 }

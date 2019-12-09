@@ -1,10 +1,11 @@
 package service
 
-import model.Tables.{Project, ProjectRow}
+import model.Tables.{Project, ProjectRow, Module}
 import slick.jdbc.SQLiteProfile.api._
 import utils.Store.{ID, ProjectVar}
 import utils.result._
 import utils.handle._
+import slick.jdbc.SQLiteProfile.api._
 
 object ProjectService
 {
@@ -18,22 +19,47 @@ object ProjectService
     {
         // add
         if (pro.projId == -1) {
-            val insert = Project += ProjectRow(-1, pro.projName, Some(pro.projDesc), nowToString, nowToString)
-            val maxID = Project.map(_.projId).max
-            val getProject = Project.filter(_.projId === maxID).result
-            db.run((insert >> getProject).transactionally).map { res => success(res.headOption, "add successfully") }
+            var sign = "success"
+            println(pro)
+            val insert = Project.filter(p => p.projName === pro.projName).exists.result.flatMap(exists => {
+                if (!exists) {
+                    Project += ProjectRow(-1, pro.projName, Some(pro.projDesc), nowToString, nowToString)
+                }
+                else {
+                    sign = "failure"
+                    DBIO.successful(None)
+                }
+            }).transactionally
+            exec(insert, db)
+            if (sign == "failure")
+                failure("", "project name already exists")
+            else if (sign == "success") {
+                val getProject = Project.filter(_.projId === Project.map(_.projId).max).result
+                db.run(getProject).map { res => success(res.headOption, "add successfully") }
+            }
         }
         // update
         else {
-            val updateProject = Project.filter(_.projId === pro.projId).map(p => (p.projName, p.projDesc,p.editedTime)).update((pro.projName, Some(pro.projDesc),nowToString))
+            val updateProject = Project.filter(_.projId === pro.projId).map(p => (p.projName, p.projDesc, p.editedTime)).update((pro.projName, Some(pro.projDesc), nowToString))
             val getProject = Project.filter(_.projId === pro.projId).result
             db.run((updateProject >> getProject).transactionally).map(res => success(res.headOption, "update successfully"))
         }
     }
 
-    def deleteProject(i: ID) =
+    def deleteProject(projId: Int) =
     {
-        val deleteProject = Project.filter(_.projId === i.id).delete
-        db.run(deleteProject).map(_ => success("OK", "delete Successfully"))
+        val deleteApi =
+            sqlu"""
+                delete FROM api where api.mod_id in
+                (SELECT mod_id from module where module.proj_id in
+                 (SELECT proj_id from project where proj_id=${projId}))
+                """
+        val deleteModule =
+            sqlu"""
+                delete from module where module.proj_id in
+                (SELECT proj_id from project where proj_id=${projId})
+                """
+        val deleteProject = Project.filter(_.projId === projId).delete
+        db.run((deleteApi >> deleteModule >> deleteProject).transactionally).map(_ => success("OK", "delete Successfully"))
     }
 }

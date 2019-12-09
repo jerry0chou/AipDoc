@@ -16,10 +16,23 @@ object ApiService
     def addApi(api: ApiVar) =
     {
         if (api.apiId == -1) {
-            val insertApi = Api += ApiRow(-1, api.modId, api.apiName, api.apiType, None, None, None, nowToString, nowToString)
-            val maxID = Api.map(_.apiId).max
-            val getApi = Api.filter(_.apiId === maxID).result
-            db.run((insertApi >> getApi).transactionally).map(res => success(res.headOption, "add successfully"))
+            var sign = "success"
+            val insert = Api.filter(a => a.apiName === api.apiName && a.modId === api.modId).exists.result.flatMap(exists => {
+                if (!exists)
+                    Api += ApiRow(-1, api.modId, api.apiName, api.apiType, None, None, None, nowToString, nowToString)
+                else {
+                    sign = "failure"
+                    DBIO.successful(None)
+                }
+            }).transactionally
+            exec(insert, db)
+
+            if (sign == "failure")
+                failure("", "api name aliready exists")
+            else {
+                val getApi = Api.filter(_.apiId === Api.map(_.apiId).max).result
+                db.run(getApi).map(res => success(res.headOption, "add successfully"))
+            }
         }
     }
 

@@ -27,7 +27,7 @@ class ProjectServlet(val db: Database) extends ScalatraServlet with FutureSuppor
     //delete
     post("/deleteProject") {
         val id = parsedBody.extract[ID]
-        ProjectService.deleteProject(id)
+        ProjectService.deleteProject(id.id)
     }
 }
 
