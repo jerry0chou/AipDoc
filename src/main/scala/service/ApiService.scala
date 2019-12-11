@@ -1,7 +1,7 @@
 package service
 
 import slick.jdbc.SQLiteProfile.api._
-import utils.Store.{ApiInfo, ApiVar, JsonString}
+import utils.Store.{ApiInfo, ApiVar, JsonString, ShortApi}
 import model.Tables._
 import slick.jdbc.GetResult
 import utils.result._
@@ -26,7 +26,6 @@ object ApiService
                 }
             }).transactionally
             exec(insert, db)
-
             if (sign == "failure")
                 failure("", "api name aliready exists")
             else {
@@ -106,5 +105,11 @@ object ApiService
             val str = build(ele.apiName, ele.apiType, ele.success)
             success(str, "already generate python code")
         })
+    }
+
+    def editApi(api: ShortApi) =
+    {
+        val update = Api.filter(_.apiId === api.apiId).map(a => (a.apiName, a.apiType)).update((api.apiName, api.apiType))
+        db.run(update).map(res => success(res, "update successfully"))
     }
 }

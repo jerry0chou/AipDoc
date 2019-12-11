@@ -29,7 +29,16 @@ class MockServlet(val db: Database) extends ScalatraServlet with FutureSupport w
         println("Request Path : " + typo + " " + path)
         println("Request params : \n" + params)
         println("-----------Mock End---------------")
-        val getApi = Api.filter(_.apiName === path).map(_.success.getOrElse("")).result
-        db.run(getApi).map(_.head)
+        val p = """\w+""".r
+        val list = p.findAllIn(path).toList
+        val getApi = Api.filter(
+            a => {
+                if (list.size >= 2)
+                    a.apiName === list.drop(1).mkString("/","/","")
+                else
+                    a.apiId === -1 // not found
+            }
+        ).map(_.success.getOrElse("")).result
+        db.run(getApi).map(_.headOption.getOrElse(""))
     }
 }
