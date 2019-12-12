@@ -5,8 +5,7 @@ import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.{FutureSupport, ScalatraServlet}
 import slick.jdbc.SQLiteProfile.api._
 import model.Tables._
-import utils.result._
-import utils.Store._
+
 
 class MockServlet(val db: Database) extends ScalatraServlet with FutureSupport with JacksonJsonSupport
 {

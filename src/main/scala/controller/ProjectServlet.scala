@@ -6,7 +6,7 @@ import slick.jdbc.SQLiteProfile.api._
 import org.json4s.{DefaultFormats, Formats}
 import org.scalatra.json._
 import org.json4s.jackson.JsonMethods._
-import utils.Store.{ID, ProjectVar}
+import utils.Store.{Conf, ID, ProjectVar}
 
 class ProjectServlet(val db: Database) extends ScalatraServlet with FutureSupport with JacksonJsonSupport
 {
@@ -28,6 +28,14 @@ class ProjectServlet(val db: Database) extends ScalatraServlet with FutureSuppor
     post("/deleteProject") {
         val id = parsedBody.extract[ID]
         ProjectService.deleteProject(id.id)
+    }
+    post("/getProjectConf") {
+        val id = parsedBody.extract[ID]
+        ProjectService.getProjectConf(id.id)
+    }
+    post("/saveProjectConf") {
+        val conf = parsedBody.extract[Conf]
+        ProjectService.saveProjectConf(conf)
     }
 }
 

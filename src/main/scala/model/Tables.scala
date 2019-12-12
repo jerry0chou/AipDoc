@@ -14,7 +14,7 @@ trait Tables {
   import slick.jdbc.{GetResult => GR}
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = Api.schema ++ Module.schema ++ Project.schema
+  lazy val schema: profile.SchemaDescription = Api.schema ++ Module.schema ++ Project.schema ++ Setting.schema
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -134,4 +134,27 @@ trait Tables {
   }
   /** Collection-like TableQuery object for table Project */
   lazy val Project = new TableQuery(tag => new Project(tag))
+
+  /** Entity class storing rows of table Setting
+   *  @param projId Database column proj_id SqlType(INTEGER), PrimaryKey
+   *  @param conf Database column conf SqlType(TEXT) */
+  case class SettingRow(projId: Int, conf: Option[String])
+  /** GetResult implicit for fetching SettingRow objects using plain SQL queries */
+  implicit def GetResultSettingRow(implicit e0: GR[Int], e1: GR[Option[String]]): GR[SettingRow] = GR{
+    prs => import prs._
+    SettingRow.tupled((<<[Int], <<?[String]))
+  }
+  /** Table description of table setting. Objects of this class serve as prototypes for rows in queries. */
+  class Setting(_tableTag: Tag) extends profile.api.Table[SettingRow](_tableTag, "setting") {
+    def * = (projId, conf) <> (SettingRow.tupled, SettingRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(projId), conf).shaped.<>({r=>import r._; _1.map(_=> SettingRow.tupled((_1.get, _2)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column proj_id SqlType(INTEGER), PrimaryKey */
+    val projId: Rep[Int] = column[Int]("proj_id", O.PrimaryKey)
+    /** Database column conf SqlType(TEXT) */
+    val conf: Rep[Option[String]] = column[Option[String]]("conf")
+  }
+  /** Collection-like TableQuery object for table Setting */
+  lazy val Setting = new TableQuery(tag => new Setting(tag))
 }

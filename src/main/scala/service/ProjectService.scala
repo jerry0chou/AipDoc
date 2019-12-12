@@ -1,8 +1,8 @@
 package service
 
-import model.Tables.{Project, ProjectRow, Module}
+import model.Tables.{Module, Project, ProjectRow, Setting, SettingRow}
 import slick.jdbc.SQLiteProfile.api._
-import utils.Store.{ID, ProjectVar}
+import utils.Store.{Conf, ID, ProjectVar}
 import utils.result._
 import utils.handle._
 import slick.jdbc.SQLiteProfile.api._
@@ -61,5 +61,17 @@ object ProjectService
                 """
         val deleteProject = Project.filter(_.projId === projId).delete
         db.run((deleteApi >> deleteModule >> deleteProject).transactionally).map(_ => success("OK", "delete Successfully"))
+    }
+
+    def getProjectConf(projId: Int) =
+    {
+        val getConf = Setting.filter(_.projId === projId).map(_.conf).result
+        db.run(getConf).map(res => success(res.headOption.getOrElse(""), "getProjectConf successfully"))
+    }
+
+    def saveProjectConf(conf: Conf) =
+    {
+        val upinsert = Setting.insertOrUpdate(SettingRow(conf.projId, Some(conf.conf)))
+        db.run(upinsert).map(res=>success(res,"saveProjectConf successfully"))
     }
 }

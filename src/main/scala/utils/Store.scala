@@ -27,4 +27,6 @@ object Store
 
     case class MockData(params: String, response: String)
 
+    case class Conf(projId:Int,conf:String)
+
 }
