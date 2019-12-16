@@ -1,12 +1,13 @@
 package service
 
 import slick.jdbc.SQLiteProfile.api._
-import utils.Store.{ApiInfo, ApiVar, JsonString, ShortApi}
+import utils.Store.{ApiInfo, ApiVar, JsonString, ProjectApi, RunApiJson, ShortApi}
 import model.Tables._
+import requests.Requester
 import slick.jdbc.GetResult
 import utils.result._
 import utils.handle._
-
+import org.json4s.jackson.JsonMethods._
 object ApiService
 {
     var db: Database = _
@@ -111,5 +112,26 @@ object ApiService
     {
         val update = Api.filter(_.apiId === api.apiId).map(a => (a.apiName, a.apiType)).update((api.apiName, api.apiType))
         db.run(update).map(res => success(res, "update successfully"))
+    }
+
+    def runApi(pa: ProjectApi) =
+    {
+        val getApi = Api.filter(_.apiId === pa.apiId).result
+        val api = exec(getApi, db).head
+        val params = api.params.getOrElse("").replaceAll(""","desc":".*?",""", "").replaceAll(""""editable":((true)|(false))""", "")
+        val suc = api.success.getOrElse("")
+        val getConf = Setting.filter(_.projId === pa.projId).map(_.conf).result
+        val host_port = exec(getConf, db).head
+        val address = host_port.getOrElse("") + api.apiName
+        var response = ""
+        if (api.apiType == "POST") {
+            val r = requests.post(address, data = params, headers = Map("Content-Type" -> "application/json"))
+            response = r.text
+        }
+        else {
+            val r = requests.get(address)
+            response = r.text
+        }
+        success(RunApiJson( suc, response), "getsuccessfully")
     }
 }

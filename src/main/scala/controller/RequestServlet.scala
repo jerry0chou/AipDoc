@@ -17,7 +17,8 @@ class RequestServlet(val db: Database) extends ScalatraServlet with FutureSuppor
 
     post("/"){
         val id=parsedBody.extract[ID]
-        println(id)
+        println(id.id)
+        
         val r=requests.get("https://api.github.com/users/lihaoyi")
         println(r.statusCode,r.headers("content-type"),r.text)
     }
