@@ -31,6 +31,9 @@ object Store
 
     case class ProjectApi(projId: Int, apiId: Int)
 
-    case class RunApiJson( original: String, real: String)
+    case class RunApiJson(original: String, real: String)
 
+    case class DownloadType(typename: String)
+
+    case class RequestJson(name:String,value:String,desc:String)
 }

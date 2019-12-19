@@ -1,11 +1,13 @@
 package service
 
-import model.Tables.{Module, Project, ProjectRow, Setting, SettingRow}
-import slick.jdbc.SQLiteProfile.api._
-import utils.Store.{Conf, ID, ProjectVar}
+import java.io.{File, FileInputStream, FileOutputStream}
+import model.Tables.{Project, ProjectRow, Setting, SettingRow}
+import slick.jdbc.GetResult
+import utils.Store.{ApiInfo, Conf, ProjectVar}
 import utils.result._
 import utils.handle._
 import slick.jdbc.SQLiteProfile.api._
+import utils.htmlTemplate
 
 object ProjectService
 {
@@ -72,6 +74,36 @@ object ProjectService
     def saveProjectConf(conf: Conf) =
     {
         val upinsert = Setting.insertOrUpdate(SettingRow(conf.projId, Some(conf.conf)))
-        db.run(upinsert).map(res=>success(res,"saveProjectConf successfully"))
+        db.run(upinsert).map(res => success(res, "saveProjectConf successfully"))
+    }
+
+    def queryPdfInfo(projId: Int) =
+    {
+        implicit val getApiInfoResult = GetResult(r => ApiInfo(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<))
+        val query =
+            sql"""
+                SELECT module.mod_name,api_name,api.api_type, api.params,api.success,api.failure
+                from module,api
+                where  api.mod_id = module.mod_id and module.proj_id=${projId}
+               """.as[ApiInfo]
+        val apiInfoList = exec(query, db)
+        val queryProjName = Project.filter(_.projId === projId).map(_.projName).result
+        val projName = exec(queryProjName.head, db)
+        (projName, apiInfoList.toList)
+    }
+
+    def download(projId: Int, typename: String) =
+    {
+        println(typename)
+        queryPdfInfo(projId)
+        if (typename == "pdf") {
+            val (projName, apiInfoList) = queryPdfInfo(projId)
+            htmlTemplate.render(projName, apiInfoList)
+            genPdf("src/main/resources/msyh.ttf", s"src/main/resources/${projName}.html", s"src/main/resources/${projName}.pdf")
+            val file = new File(s"src/main/resources/${projName}.pdf")
+            file
+        }
+        else
+            new File("src/main/resources/index}.pdf")
     }
 }

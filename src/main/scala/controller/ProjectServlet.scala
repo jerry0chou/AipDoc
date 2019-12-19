@@ -6,7 +6,7 @@ import slick.jdbc.SQLiteProfile.api._
 import org.json4s.{DefaultFormats, Formats}
 import org.scalatra.json._
 import org.json4s.jackson.JsonMethods._
-import utils.Store.{Conf, ID, ProjectVar}
+import utils.Store.{Conf, DownloadType, ID, ProjectVar}
 
 class ProjectServlet(val db: Database) extends ScalatraServlet with FutureSupport with JacksonJsonSupport
 {
@@ -36,6 +36,13 @@ class ProjectServlet(val db: Database) extends ScalatraServlet with FutureSuppor
     post("/saveProjectConf") {
         val conf = parsedBody.extract[Conf]
         ProjectService.saveProjectConf(conf)
+    }
+    get("/download") {
+        println(params)
+        contentType = "application/octet-stream"
+        val file = ProjectService.download(params("projId").toInt,params("typename"))
+        response.setHeader("Content-Disposition", "attachment; filename=" + file.getName)
+        file
     }
 }
 

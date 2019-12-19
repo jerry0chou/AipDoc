@@ -132,6 +132,6 @@ object ApiService
             val r = requests.get(address)
             response = r.text
         }
-        success(RunApiJson( suc, response), "getsuccessfully")
+        success(RunApiJson( suc, response), "get successfully")
     }
 }

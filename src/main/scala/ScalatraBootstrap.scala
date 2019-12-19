@@ -1,4 +1,4 @@
-import controller.{ApiServlet, IndexServlet, MockServlet, ModuleServlet, ProjectServlet, RequestServlet}
+import controller.{ApiServlet, IndexServlet, MockServlet, ModuleServlet, ProjectServlet}
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.scalatra._
 import javax.servlet.ServletContext
@@ -21,7 +21,6 @@ class ScalatraBootstrap extends LifeCycle
         context.mount(new ModuleServlet(db), "/module")
         context.mount(new ApiServlet(db), "/api")
         context.mount(new MockServlet(db), "/mock")
-        context.mount(new RequestServlet(db), "/request")
     }
 
     override def destroy(context: ServletContext)
