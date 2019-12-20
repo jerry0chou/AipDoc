@@ -8,6 +8,7 @@ import slick.jdbc.GetResult
 import utils.result._
 import utils.handle._
 import org.json4s.jackson.JsonMethods._
+
 object ApiService
 {
     var db: Database = _
@@ -90,7 +91,7 @@ object ApiService
                    |@app.route('${apiName}', methods=['${apiType}'])
                    |def ${funcName}():
                    |    print(request.json)
-                   |    result=${success.getOrElse("")}
+                   |    result=${success.getOrElse("""''""")}
                    |    return jsonify(result)
                    |
                    |if __name__ == '__main__':
@@ -124,6 +125,7 @@ object ApiService
         val host_port = exec(getConf, db).head
         val address = host_port.getOrElse("") + api.apiName
         var response = ""
+        println(address,params)
         if (api.apiType == "POST") {
             val r = requests.post(address, data = params, headers = Map("Content-Type" -> "application/json"))
             response = r.text
@@ -132,6 +134,6 @@ object ApiService
             val r = requests.get(address)
             response = r.text
         }
-        success(RunApiJson( suc, response), "get successfully")
+        success(RunApiJson(suc, response), "get successfully")
     }
 }

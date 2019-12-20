@@ -38,7 +38,6 @@ class ProjectServlet(val db: Database) extends ScalatraServlet with FutureSuppor
         ProjectService.saveProjectConf(conf)
     }
     get("/download") {
-        println(params)
         contentType = "application/octet-stream"
         val file = ProjectService.download(params("projId").toInt,params("typename"))
         response.setHeader("Content-Disposition", "attachment; filename=" + file.getName)

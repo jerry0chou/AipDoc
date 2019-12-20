@@ -23,7 +23,7 @@ object Store
 
     case class JsonString(apiId: Int, typename: String, content: String)
 
-    case class ApiInfo(modName: String, apiName: String, apiType: String, params: String, success: String, failure: String)
+    case class ApiInfo(modName: String, apiName: String, apiType: String, params: String, success: Option[String], failure: Option[String])
 
     case class MockData(params: String, response: String)
 

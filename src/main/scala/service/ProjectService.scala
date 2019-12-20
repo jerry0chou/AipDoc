@@ -77,7 +77,7 @@ object ProjectService
         db.run(upinsert).map(res => success(res, "saveProjectConf successfully"))
     }
 
-    def queryPdfInfo(projId: Int) =
+    def queryApiInfo(projId: Int) =
     {
         implicit val getApiInfoResult = GetResult(r => ApiInfo(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<))
         val query =
@@ -94,16 +94,20 @@ object ProjectService
 
     def download(projId: Int, typename: String) =
     {
-        println(typename)
-        queryPdfInfo(projId)
+        def base(str: String) = "src/main/resources" + str
+
         if (typename == "pdf") {
-            val (projName, apiInfoList) = queryPdfInfo(projId)
+            val (projName, apiInfoList) = queryApiInfo(projId)
             htmlTemplate.render(projName, apiInfoList)
-            genPdf("src/main/resources/msyh.ttf", s"src/main/resources/${projName}.html", s"src/main/resources/${projName}.pdf")
-            val file = new File(s"src/main/resources/${projName}.pdf")
-            file
+            genPdf(base("/msyh.ttf"), base(s"/download/${projName}.html"), base(s"/download/${projName}.pdf"))
+            new File(base(s"/download/${projName}.pdf"))
+        }
+        else if (typename == "flask") {
+            val (projName, apiInfoList) = queryApiInfo(projId)
+            gensSingleFlask(projName, apiInfoList)
+            new File(base(s"/download/${projName}.py"))
         }
         else
-            new File("src/main/resources/index}.pdf")
+            new File("src/main/resources/index.pdf")
     }
 }

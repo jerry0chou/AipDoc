@@ -16,7 +16,7 @@ object htmlTemplate
     {
         def genSuccess(success: String) =
         {
-            if (success != null && success.length > 0)
+            if (success.length > 0)
                 s"""
                    | <div>
                    |    <span style="background-color: #87d068;color: white;padding: 3px;border-radius: 8px">Reponse Success</span>
@@ -31,7 +31,7 @@ object htmlTemplate
 
         def genFailure(failure: String) =
         {
-            if (failure != null && failure.length > 0)
+            if (failure.length > 0)
                 s"""
                    |<div>
                    |            <span style="background-color: #f50;color: white;padding: 3px;border-radius: 8px">Reponse Failure</span>
@@ -94,10 +94,10 @@ object htmlTemplate
                        |        </table>
                        |        <div style="margin-top: 20px">
                        |        </div>
-                       |        ${genSuccess(apiInfo.success)}
+                       |        ${genSuccess(apiInfo.success.getOrElse(""))}
                        |        <div style="margin-top: 20px">
                        |        </div>
-                       |        ${genFailure(apiInfo.failure)}
+                       |        ${genFailure(apiInfo.failure.getOrElse(""))}
                        |    </div>
                        |</div>
                        |""".stripMargin
@@ -152,7 +152,7 @@ object htmlTemplate
                |</html>
                |""".stripMargin
 
-        val writer = new PrintWriter(new File(s"src/main/resources/${projName}.html"), "utf-8")
+        val writer = new PrintWriter(new File(s"src/main/resources/download/${projName}.html"), "utf-8")
         writer.write(html)
         writer.close()
     }
