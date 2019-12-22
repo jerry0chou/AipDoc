@@ -96,18 +96,18 @@ object ProjectService
     {
         def base(str: String) = "src/main/resources" + str
 
-        if (typename == "pdf") {
-            val (projName, apiInfoList) = queryApiInfo(projId)
-            htmlTemplate.render(projName, apiInfoList)
-            genPdf(base("/msyh.ttf"), base(s"/download/${projName}.html"), base(s"/download/${projName}.pdf"))
-            new File(base(s"/download/${projName}.pdf"))
+        typename match {
+            case "pdf" =>
+                val (projName, apiInfoList) = queryApiInfo(projId)
+                htmlTemplate.render(projName, apiInfoList)
+                genPdf(base("/msyh.ttf"), base(s"/download/${projName}.html"), base(s"/download/${projName}.pdf"))
+                new File(base(s"/download/${projName}.pdf"))
+            case "flask" =>
+                val (projName, apiInfoList) = queryApiInfo(projId)
+                gensSingleFlask(projName, apiInfoList)
+                new File(base(s"/download/${projName}.py"))
+            case _ =>
+                new File("src/main/resources/index.pdf")
         }
-        else if (typename == "flask") {
-            val (projName, apiInfoList) = queryApiInfo(projId)
-            gensSingleFlask(projName, apiInfoList)
-            new File(base(s"/download/${projName}.py"))
-        }
-        else
-            new File("src/main/resources/index.pdf")
     }
 }

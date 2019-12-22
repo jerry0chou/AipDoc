@@ -5,8 +5,7 @@ import service.ProjectService
 import slick.jdbc.SQLiteProfile.api._
 import org.json4s.{DefaultFormats, Formats}
 import org.scalatra.json._
-import org.json4s.jackson.JsonMethods._
-import utils.Store.{Conf, DownloadType, ID, ProjectVar}
+import utils.Store.{Conf, ID, ProjectVar}
 
 class ProjectServlet(val db: Database) extends ScalatraServlet with FutureSupport with JacksonJsonSupport
 {

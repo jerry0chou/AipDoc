@@ -14,7 +14,7 @@ import scala.concurrent.Await
 import slick.jdbc.SQLiteProfile.api._
 import utils.Store.ApiInfo
 import scala.collection.mutable.ArrayBuffer
-import scala.xml.XML
+
 
 object handle
 {

@@ -21,14 +21,11 @@ libraryDependencies ++= Seq(
     "org.scalatra" %% "scalatra-json" % ScalatraVersion,
     "org.json4s" %% "json4s-jackson" % "3.5.3",
     "com.lihaoyi" %% "requests" % "0.2.0",
-    //    "org.apache.pdfbox" % "pdfbox" % "2.0.17"
     // html to pdf
     "com.itextpdf" % "itextpdf" % "5.4.3",
     "com.itextpdf" % "html2pdf" % "2.1.4",
     "com.itextpdf" % "font-asian" % "7.1.2",
 
-    // https://mvnrepository.com/artifact/org.scala-lang.modules/scala-xml
-     "org.scala-lang.modules" %% "scala-xml" % "1.2.0"
 
 )
 

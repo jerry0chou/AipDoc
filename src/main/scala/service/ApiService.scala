@@ -49,13 +49,10 @@ object ApiService
 
     def saveColumn(json: JsonString) =
     {
-        val update = Api.filter(_.apiId === json.apiId).map(e => {
-            if (json.typename == "params")
-                e.params
-            else if (json.typename == "success")
-                e.success
-            else
-                e.failure
+        val update = Api.filter(_.apiId === json.apiId).map(e => json.typename match {
+            case "params" => e.params
+            case "success" => e.success
+            case _ => e.failure
         }).update(Some(json.content))
         db.run(update).map(res => success(res, "update succesfully"))
     }
@@ -124,15 +121,11 @@ object ApiService
         val getConf = Setting.filter(_.projId === pa.projId).map(_.conf).result
         val host_port = exec(getConf, db).head
         val address = host_port.getOrElse("") + api.apiName
-        var response = ""
-        println(address,params)
-        if (api.apiType == "POST") {
-            val r = requests.post(address, data = params, headers = Map("Content-Type" -> "application/json"))
-            response = r.text
-        }
-        else {
-            val r = requests.get(address)
-            response = r.text
+        println(address, params)
+        val response = api.apiType match {
+            case "POST" => requests.post(address, data = params, headers = Map("Content-Type" -> "application/json")).text()
+            case "GET" => requests.get(address).text
+            case _ => "unknown request"
         }
         success(RunApiJson(suc, response), "get successfully")
     }
