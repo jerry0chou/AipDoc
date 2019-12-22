@@ -1,7 +1,7 @@
 package controller
 
 import org.scalatra.{FutureSupport, ScalatraServlet}
-import slick.jdbc.SQLiteProfile.api._
+import slick.jdbc.MySQLProfile.api._
 import org.scalatra._
 
 class IndexServlet extends ScalatraServlet with FutureSupport

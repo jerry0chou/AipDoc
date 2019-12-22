@@ -4,7 +4,7 @@ import org.json4s.{DefaultFormats, Formats}
 import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.{FutureSupport, ScalatraServlet}
 import service.ApiService
-import slick.jdbc.SQLiteProfile.api._
+import slick.jdbc.MySQLProfile.api._
 import utils.Store.{ApiVar, ID, JsonString, ProjectApi, ShortApi}
 
 class ApiServlet(val db: Database) extends ScalatraServlet with FutureSupport with JacksonJsonSupport

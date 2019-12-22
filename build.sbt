@@ -8,9 +8,11 @@ scalaVersion := "2.12.8"
 
 libraryDependencies ++= Seq(
     "com.typesafe.slick" %% "slick" % "3.2.3",
+    "org.slf4j" % "slf4j-api" % "1.7.7",
     "org.slf4j" % "slf4j-nop" % "1.6.4",
     "com.typesafe.slick" %% "slick-hikaricp" % "3.2.3",
-    "org.xerial" % "sqlite-jdbc" % "3.25.2",
+    //"org.xerial" % "sqlite-jdbc" % "3.25.2",
+    "mysql" % "mysql-connector-java" % "6.0.6",
     "com.typesafe.slick" %% "slick-codegen" % "3.2.3",
     "org.scalatra" %% "scalatra" % ScalatraVersion,
     "org.scalatra" %% "scalatra-scalatest" % ScalatraVersion % "test",
@@ -25,8 +27,6 @@ libraryDependencies ++= Seq(
     "com.itextpdf" % "itextpdf" % "5.4.3",
     "com.itextpdf" % "html2pdf" % "2.1.4",
     "com.itextpdf" % "font-asian" % "7.1.2",
-
-
 )
 
 enablePlugins(SbtTwirl)

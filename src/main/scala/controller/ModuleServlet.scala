@@ -3,7 +3,7 @@ package controller
 import org.scalatra._
 import org.scalatra.{FutureSupport, ScalatraServlet}
 import service.ModuleService
-import slick.jdbc.SQLiteProfile.api._
+import slick.jdbc.MySQLProfile.api._
 import org.json4s.{DefaultFormats, Formats}
 import org.scalatra.json._
 import utils.Store.{ID, ModuleVar}

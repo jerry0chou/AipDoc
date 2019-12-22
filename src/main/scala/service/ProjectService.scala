@@ -6,7 +6,7 @@ import slick.jdbc.GetResult
 import utils.Store.{ApiInfo, Conf, ProjectVar}
 import utils.result._
 import utils.handle._
-import slick.jdbc.SQLiteProfile.api._
+import slick.jdbc.MySQLProfile.api._
 import utils.htmlTemplate
 
 object ProjectService

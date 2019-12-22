@@ -3,7 +3,7 @@ package controller
 import org.json4s.{DefaultFormats, Formats}
 import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.{FutureSupport, ScalatraServlet}
-import slick.jdbc.SQLiteProfile.api._
+import slick.jdbc.MySQLProfile.api._
 import model.Tables._
 
 

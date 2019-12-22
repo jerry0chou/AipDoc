@@ -1,6 +1,6 @@
 package service
 
-import slick.jdbc.SQLiteProfile.api._
+import slick.jdbc.MySQLProfile.api._
 import utils.Store.{ApiInfo, ApiVar, JsonString, ProjectApi, RunApiJson, ShortApi}
 import model.Tables._
 import requests.Requester

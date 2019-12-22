@@ -1,7 +1,7 @@
 package service
 
 import model.Tables._
-import slick.jdbc.SQLiteProfile.api._
+import slick.jdbc.MySQLProfile.api._
 import utils.Store.{ID, ModApiList, ModuleVar, SimpleApi}
 import utils.result._
 import utils.handle._
