@@ -1,13 +1,13 @@
 package service
 
-import java.io.{File, FileInputStream, FileOutputStream}
+import java.io.{File}
 import model.Tables.{Project, ProjectRow, Setting, SettingRow}
 import slick.jdbc.GetResult
 import utils.Store.{ApiInfo, Conf, ProjectVar}
-import utils.result._
-import utils.handle._
+import utils.Result._
+import utils.Handle._
 import slick.jdbc.MySQLProfile.api._
-import utils.htmlTemplate
+import utils.Config.staticPath
 
 object ProjectService
 {
@@ -94,20 +94,17 @@ object ProjectService
 
     def download(projId: Int, typename: String) =
     {
-        def base(str: String) = "src/main/resources" + str
-
         typename match {
             case "pdf" =>
-                val (projName, apiInfoList) = queryApiInfo(projId)
-                htmlTemplate.render(projName, apiInfoList)
-                genPdf(base("/msyh.ttf"), base(s"/download/${projName}.html"), base(s"/download/${projName}.pdf"))
-                new File(base(s"/download/${projName}.pdf"))
+                val projName=genHtml(projId)
+                genPdf(staticPath("/msyh.ttf"), staticPath(s"/download/${projName}.html"), staticPath(s"/download/${projName}.pdf"))
+                new File(staticPath(s"/download/${projName}.pdf"))
             case "flask" =>
                 val (projName, apiInfoList) = queryApiInfo(projId)
                 gensSingleFlask(projName, apiInfoList)
-                new File(base(s"/download/${projName}.py"))
+                new File(staticPath(s"/download/${projName}.py"))
             case _ =>
-                new File("src/main/resources/index.pdf")
+                new File(staticPath("/404.pdf"))
         }
     }
 }

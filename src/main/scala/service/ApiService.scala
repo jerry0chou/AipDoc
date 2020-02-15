@@ -5,8 +5,8 @@ import utils.Store.{ApiInfo, ApiVar, JsonString, ProjectApi, RunApiJson, ShortAp
 import model.Tables._
 import requests.Requester
 import slick.jdbc.GetResult
-import utils.result._
-import utils.handle._
+import utils.Result._
+import utils.Handle._
 import org.json4s.jackson.JsonMethods._
 
 object ApiService

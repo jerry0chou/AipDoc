@@ -1,6 +1,6 @@
 package utils
 
-object result
+object Result
 {
 
     case class ResultSet[T](code: Int, data: T, msg: String)

@@ -17,6 +17,9 @@ class ProjectServlet(val db: Database) extends ScalatraServlet with FutureSuppor
         contentType = formats("json")
     }
     get("/getProjectList") {
+        val path =getServletContext.getRealPath("/")
+//        val path3=getClass.getClassLoader.getResource("/").getPath()
+        println("path", path)
         ProjectService.getProjectList
     }
     post("/addOrEditProject") {
@@ -38,7 +41,7 @@ class ProjectServlet(val db: Database) extends ScalatraServlet with FutureSuppor
     }
     get("/download") {
         contentType = "application/octet-stream"
-        val file = ProjectService.download(params("projId").toInt,params("typename"))
+        val file = ProjectService.download(params("projId").toInt, params("typename"))
         response.setHeader("Content-Disposition", "attachment; filename=" + file.getName)
         file
     }

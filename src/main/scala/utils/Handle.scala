@@ -8,15 +8,18 @@ import com.itextpdf.html2pdf.resolver.font.DefaultFontProvider
 import com.itextpdf.io.font.FontProgramFactory
 import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.{PdfDocument, PdfWriter}
+import org.json4s.DefaultFormats
+import org.json4s.jackson.JsonMethods.parse
+import service.ProjectService.queryApiInfo
 import slick.dbio.DBIO
 import scala.concurrent.duration._
 import scala.concurrent.Await
 import slick.jdbc.SQLiteProfile.api._
-import utils.Store.ApiInfo
+import utils.Store.{ApiInfo, RequestJson}
+import utils.Config.staticPath
 import scala.collection.mutable.ArrayBuffer
 
-
-object handle
+object Handle
 {
     def nowToString: String =
     {
@@ -24,6 +27,17 @@ object handle
     }
 
     def exec[T](action: DBIO[T], db: Database): T = Await.result(db.run(action), 2.seconds)
+
+    def genHtml(projId: Int) =
+    {
+        val (projName, apiInfoList) = queryApiInfo(projId)
+        val html = views.html.project(projName, apiInfoList: List[ApiInfo])
+        val filename = staticPath(s"/download/${projName}.html")
+        val writer = new PrintWriter(new File(filename), "utf-8")
+        writer.write(html.toString())
+        writer.close()
+        projName
+    }
 
     def genPdf(font: String, html: String, dest: String) =
     {
@@ -73,8 +87,21 @@ object handle
                |    app.run(debug=True)
                |
                |""".stripMargin
-        val writer = new PrintWriter(new File(s"src/main/resources/download/${projName}.py"), "utf-8")
+        val writer = new PrintWriter(new File(getClass.getResource(s"/download/${projName}.py").getPath), "utf-8")
         writer.write(frame)
         writer.close()
+    }
+
+    def parseStringIntoJson(json: String) =
+    {
+        implicit val formats = DefaultFormats
+        val str = json.replaceAll(""","editable":((true)|(false))""", "")
+        println("replaceAll gentable", str)
+        if (str.length > 0) {
+            val requestJsonList = parse(str).extract[List[RequestJson]]
+            requestJsonList
+        }
+        else
+            null
     }
 }

@@ -3,8 +3,8 @@ package service
 import model.Tables._
 import slick.jdbc.MySQLProfile.api._
 import utils.Store.{ID, ModApiList, ModuleVar, SimpleApi}
-import utils.result._
-import utils.handle._
+import utils.Result._
+import utils.Handle._
 import scala.collection.mutable.ArrayBuffer
 
 object ModuleService

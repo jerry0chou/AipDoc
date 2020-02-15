@@ -21,6 +21,7 @@ class ApiServlet(val db: Database) extends ScalatraServlet with FutureSupport wi
         ApiService.addApi(api)
     }
     post("/editApi"){
+
         val shortApi = parsedBody.extract[ShortApi]
         ApiService.editApi(shortApi)
     }
