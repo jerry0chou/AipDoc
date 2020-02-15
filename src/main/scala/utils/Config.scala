@@ -2,5 +2,16 @@ package utils
 
 object Config
 {
-    def staticPath(filename:String)="src/main/resources/"+filename
+    var staticHead = ""
+
+    def staticPath(filename: String) =
+    {
+        var path = ""
+        if (staticHead == "" || staticHead.contains("target"))
+            path = "src/main/webapp/static" + filename
+        else
+            path = staticHead.replace("\\", "/") + "/static" + filename
+        println(path)
+        path
+    }
 }

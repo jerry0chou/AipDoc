@@ -1,12 +1,16 @@
 package controller
 
+import java.io.File
+
 import org.scalatra._
 import service.ProjectService
 import slick.jdbc.MySQLProfile.api._
 import org.json4s.{DefaultFormats, Formats}
 import org.scalatra.json._
+import utils.Config
 import utils.Store.{Conf, ID, ProjectVar}
-
+import utils.Handle.deleteDir
+import utils.Config.staticPath
 class ProjectServlet(val db: Database) extends ScalatraServlet with FutureSupport with JacksonJsonSupport
 {
     protected implicit def executor = scala.concurrent.ExecutionContext.Implicits.global
@@ -40,6 +44,7 @@ class ProjectServlet(val db: Database) extends ScalatraServlet with FutureSuppor
         ProjectService.saveProjectConf(conf)
     }
     get("/download") {
+        Config.staticHead=getServletContext().getRealPath("/")
         contentType = "application/octet-stream"
         val file = ProjectService.download(params("projId").toInt, params("typename"))
         response.setHeader("Content-Disposition", "attachment; filename=" + file.getName)

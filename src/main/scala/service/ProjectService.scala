@@ -101,10 +101,10 @@ object ProjectService
                 new File(staticPath(s"/download/${projName}.pdf"))
             case "flask" =>
                 val (projName, apiInfoList) = queryApiInfo(projId)
-                gensSingleFlask(projName, apiInfoList)
+                genSingleFlask(projName, apiInfoList)
                 new File(staticPath(s"/download/${projName}.py"))
             case _ =>
-                new File(staticPath("/404.pdf"))
+                new File(staticPath("/download/404.html"))
         }
     }
 }

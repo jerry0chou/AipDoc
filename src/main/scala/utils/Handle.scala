@@ -53,7 +53,7 @@ object Handle
         HtmlConverter.convertToPdf(new FileInputStream(html), new FileOutputStream(dest), props)
     }
 
-    def gensSingleFlask(projName: String, apiInfoList: List[ApiInfo]) =
+    def genSingleFlask(projName: String, apiInfoList: List[ApiInfo]) =
     {
         def build(apiInfoList: List[ApiInfo]) =
         {
@@ -87,7 +87,7 @@ object Handle
                |    app.run(debug=True)
                |
                |""".stripMargin
-        val writer = new PrintWriter(new File(getClass.getResource(s"/download/${projName}.py").getPath), "utf-8")
+        val writer = new PrintWriter(new File(staticPath(s"/download/${projName}.py")), "utf-8")
         writer.write(frame)
         writer.close()
     }
@@ -103,5 +103,18 @@ object Handle
         }
         else
             null
+    }
+
+    def deleteDir(dir: File): Unit =
+    {
+        val files = dir.listFiles()
+        files.foreach(f => {
+            if (f.isDirectory) {
+                deleteDir(f)
+            } else {
+                f.delete()
+                println("delete file " + f.getAbsolutePath)
+            }
+        })
     }
 }
