@@ -1,0 +1,110 @@
+@import _root_.utils.Handle.parseStringIntoJson
+@import _root_.utils.Store.ApiInfo
+@(projName: String, apiInfoList: List[ApiInfo])
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>@projName</title>
+    </head>
+    <body>
+        <style>
+                table {
+
+                    border: silver solid 1px;
+                    width: 690px;
+                }
+
+                th {
+                    border: silver 1px solid;
+                    padding: 7px;
+                    width: 100px;
+                    background-color: #108ee9;
+                    color: white;
+                }
+
+                tr, td {
+                    border: silver 1px solid;
+                    padding: 7px;
+                    word-break: break-all;
+                    word-wrap: break-word;
+                    white-space: normal
+                }
+
+                pre {
+                    padding: 8px;
+                    font-size: 12px;
+                    background-color: #f6f8fa;
+                    width: 690px;
+                    font-weight: bold;
+                    border-radius: 12px;
+                }
+        </style>
+
+         @for((apiInfo, index) <- apiInfoList.view.zipWithIndex) {
+            <div>
+            <span style="background-color: #e17c28;
+                color: white;
+                padding: 5px;
+                border-radius: 8px">@{index+1} .</span>
+            <span style="background-color: #9000ff;
+                color: white;
+                padding: 5px;
+                border-radius: 8px">@{apiInfo.modName}</span>
+            <span style="color: white;
+                background-color: #108ee9;
+                padding: 5px;
+                border-radius: 8px">@(apiInfo.apiType)  @(apiInfo.apiName)</span>
+            <div style="margin-top: 10px">
+                <table cellpadding=“0” cellspacing="0">
+                    <tr>
+                        <th>Param Name</th>
+                        <th>Param Value</th>
+                        <th>Param Desc</th>
+                    </tr>
+                    @for(request <- parseStringIntoJson(apiInfo.params)){
+                        <tr>
+                            <td>@{request.name}</td>
+                            <td>@{request.value}</td>
+                            <td>@{request.desc}</td>
+                        </tr>
+                    }
+
+                </table>
+                <div style="margin-top: 20px">
+                </div>
+
+                @if(apiInfo.success.getOrElse("") != ""){
+                  <div>
+                    <span style="background-color: #87d068;
+                        color: white;
+                        padding: 3px;
+                        border-radius: 8px">Response Success</span>
+                </div>
+                    <pre>
+                       @apiInfo.success.get
+                    </pre>
+                }
+
+
+                <div style="margin-top: 20px">
+                </div>
+                @if(apiInfo.failure.getOrElse("") != ""){
+                  <div>
+                    <span style="background-color: #87d068;
+                        color: white;
+                        padding: 3px;
+                        border-radius: 8px">Response Failure</span>
+                </div>
+                    <pre>
+                       @apiInfo.failure.get
+                    </pre>
+                }
+
+
+            </div>
+        </div>
+        }
+
+    </body>
+</html>
