@@ -13,6 +13,20 @@ object ModuleService
 
     protected implicit def executor = scala.concurrent.ExecutionContext.Implicits.global
 
+    private def handleApiInfo(ele: Vector[(Int, String, Int, String, String)]) =
+    {
+        val map = ele.groupBy(e => (e._1, e._2)).mapValues(e => e.map(e => (e._3, e._4, e._5)))
+        val res = ArrayBuffer[ModApiList]()
+        for ((k, v) <- map) {
+            val ab = ArrayBuffer[SimpleApi]()
+            v.filterNot(_._2 == null).map { e =>
+                ab += SimpleApi(e._1, e._2, e._3)
+            }
+            res += ModApiList(k._1, k._2, ab)
+        }
+        res
+    }
+
     def getModApi(projId: Int) =
     {
         val query = sql"""
@@ -20,18 +34,17 @@ object ModuleService
                from module LEFT JOIN api ON module.mod_id = api.mod_id
                WHERE module.proj_id=${projId}  ORDER BY module.mod_id ASC
                """.as[(Int, String, Int, String, String)]
-        db.run(query).map(ele => {
-            val map = ele.groupBy(e => (e._1, e._2)).mapValues(e => e.map(e => (e._3, e._4, e._5)))
-            val res = ArrayBuffer[ModApiList]()
-            for ((k, v) <- map) {
-                val ab = ArrayBuffer[SimpleApi]()
-                v.filterNot(_._2 == null).map { e =>
-                    ab += SimpleApi(e._1, e._2, e._3)
-                }
-                res += ModApiList(k._1, k._2, ab)
-            }
-            success(res, "getModApi successfully")
-        })
+        db.run(query).map(ele => success(handleApiInfo(ele), "getModApi successfully"))
+    }
+
+    def latestModify(projId: Int) =
+    {
+        val query = sql"""
+              SELECT module.mod_id ,module.mod_name,api.api_id,api.api_name,api.api_type
+               from module LEFT JOIN api ON module.mod_id = api.mod_id
+               WHERE module.proj_id=${projId}  ORDER BY api.edited_time  DESC LIMIT 10
+               """.as[(Int, String, Int, String, String)]
+        db.run(query).map(ele => success(handleApiInfo(ele), "get latest modified api successfully"))
     }
 
     def addOrEditModule(mod: ModuleVar) =

@@ -29,7 +29,7 @@ object ApiService
             }).transactionally
             exec(insert, db)
             if (sign == "failure")
-                failure("", "api name aliready exists")
+                failure("", "api name already exists")
             else {
                 val getApi = Api.filter(_.apiId === Api.map(_.apiId).max).result
                 db.run(getApi).map(res => success(res.headOption, "add successfully"))
@@ -49,12 +49,15 @@ object ApiService
 
     def saveColumn(json: JsonString) =
     {
-        val update = Api.filter(_.apiId === json.apiId).map(e => json.typename match {
-            case "params" => e.params
-            case "success" => e.success
-            case _ => e.failure
-        }).update(Some(json.content))
-        db.run(update).map(res => success(res, "update succesfully"))
+        val update = Api.filter(_.apiId === json.apiId).map(e => {
+            val t = json.typename match {
+                case "params" => e.params
+                case "success" => e.success
+                case _ => e.failure
+            }
+            (t, e.editedTime)
+        }).update(Some(json.content), nowToString)
+        db.run(update).map(res => success(res, "update successfully"))
     }
 
     def getApiInfo(apiId: Int) =
@@ -108,7 +111,7 @@ object ApiService
 
     def editApi(api: ShortApi) =
     {
-        val update = Api.filter(_.apiId === api.apiId).map(a => (a.apiName, a.apiType)).update((api.apiName, api.apiType))
+        val update = Api.filter(_.apiId === api.apiId).map(a => (a.apiName, a.apiType, a.editedTime)).update((api.apiName, api.apiType, nowToString))
         db.run(update).map(res => success(res, "update successfully"))
     }
 
@@ -129,4 +132,6 @@ object ApiService
         }
         success(RunApiJson(suc, response), "get successfully")
     }
+
+
 }

@@ -94,15 +94,18 @@ object Handle
 
     def parseStringIntoJson(json: String) =
     {
+        var string=json
+        if(json==null)
+            string=""
         implicit val formats = DefaultFormats
-        val str = json.replaceAll(""","editable":((true)|(false))""", "")
+        val str = string.replaceAll(""","editable":((true)|(false))""", "")
         println("replaceAll gentable", str)
         if (str.length > 0) {
             val requestJsonList = parse(str).extract[List[RequestJson]]
             requestJsonList
         }
         else
-            null
+            List.empty[RequestJson]
     }
 
     def deleteDir(dir: File): Unit =
